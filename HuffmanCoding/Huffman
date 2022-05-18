@@ -1,0 +1,108 @@
+import java.io.*;
+import java.util.*;
+class Wezel {
+    int p;
+    char c;
+    Wezel lewy;
+    Wezel prawy;
+}
+
+class Comp implements Comparator<Wezel> {
+    public int compare(Wezel x, Wezel y)
+    {
+        return x.p - y.p;
+    }
+}
+
+
+public class Huffman {
+    public static void print(Wezel root, String s)
+    {
+        if (root.lewy == null && root.prawy == null) {
+            System.out.println("\"" + root.c + "\"" + " = " + s);
+            return;
+        }
+        print(root.lewy, s + "0");
+        print(root.prawy, s + "1");
+    }
+
+    public static char[] readFile(File file, StringBuffer buf) throws IOException
+    {
+        FileReader fr = null;
+        try {
+            fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            char[] cbuf = new char[(int) file.length()];
+            br.read(cbuf);
+            buf.append(cbuf);
+            br.close();
+            return cbuf;
+        }
+        finally {
+            if (fr != null) {
+                fr.close();
+            }
+        }
+    }
+
+    public static void main(String[] args) throws java.io.IOException
+    {
+        StringBuffer xx = new StringBuffer();
+        char[] f = readFile(new File("C:\\Users\\kubal\\Desktop\\Studia\\Semestr 4\\Algorytmy i Struktury danych\\Huffman\\src\\text.txt"), xx);
+        HashMap<Character, Integer> hm = new HashMap<>();
+        for (int i=0 ; i<f.length ; i++){
+            Integer key = hm.get(f[i]);
+            if (key == null)
+                hm.put(f[i], 1);
+            else
+                hm.put(f[i], hm.get(f[i])+1);
+        }
+        char[]tab = new char[hm.size()];
+        int ii=0;
+        Set<Character> keys = hm.keySet();
+        for ( Character key : keys ) {
+            tab[ii] = key;
+            ii++;
+        }
+        System.out.print("Ilość wystąpień znaków: ");
+        System.out.println(hm);
+        System.out.println("Kody znaków: ");
+        int[]prawd = new int[hm.size()];
+        int iii=0;
+        List<Integer> values = new ArrayList<>(hm.values());
+        for ( Integer value : values ) {
+            prawd[iii] = value;
+            iii++;
+        }
+        char[] tab1 = { 'c', 'f', 'a', 'd', 'e', 'b' };
+        int[] prawd1 = { 12, 45, 5, 13, 16, 9 };
+        int n = tab.length;
+        PriorityQueue<Wezel> que = new PriorityQueue<Wezel>(n, new Comp());
+
+        for (int i = 0; i < n; i++) {
+            Wezel wez = new Wezel();
+            wez.c = tab[i];
+            wez.p = prawd[i];
+            wez.lewy = null;
+            wez.prawy = null;
+            que.add(wez);
+        }
+        Wezel root = null;
+
+
+        while (que.size() != 1) {
+            Wezel x = que.peek();
+            que.poll();
+            Wezel y = que.peek();
+            que.poll();
+            Wezel sum = new Wezel();
+            sum.p = x.p + y.p;
+            sum.c = '-';
+            sum.lewy = x;
+            sum.prawy = y;
+            root = sum;
+            que.add(sum);
+        }
+        print(root, "");
+    }
+}
